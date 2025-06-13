@@ -23,15 +23,9 @@ default: &default
 development:
   <<: *default
   database: izanami_backend_development
-
-  # The specified database role being used to connect to PostgreSQL.
-  # To create additional roles in PostgreSQL see `$ createuser --help`.
-  # When left blank, PostgreSQL will use the default role. This is
-  # the same name as the operating system user running Rails.
-  #username: izanami_backend
-
-  # The password associated with the PostgreSQL role (username).
-  #password:
+  host: db
+  username: izanami
+  password: password
 
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
