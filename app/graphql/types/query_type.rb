@@ -20,12 +20,31 @@ module Types
 
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
-
-    # TODO: remove me
-    field :test_field, String, null: false,
-      description: "An example field added by the generator"
-    def test_field
-      "Hello World!"
+    field :users, [Types::UserType], null: false, description: "Returns a list of active users"
+    field :user, Types::UserType, null: true do
+      argument :id, ID, required: true, description: "ID of the user"
     end
+
+    def users
+      User.active
+    end
+
+    def user(id:)
+      User.active.find_by(id: id)
+    end
+ 
+    field :families, [Types::FamilyType], null: false, description: "Returns a list of families"
+    field :family, Types::FamilyType, null: true do
+      argument :id, ID, required: true, description: "ID of the family"
+    end
+
+    def families
+      Family.active
+    end
+
+    def family(id:)
+      Family.active.find_by(id: id)
+    end
+
   end
 end
