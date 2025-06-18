@@ -1,0 +1,13 @@
+ja:
+  activerecord:
+    errors:
+      messages:
+        blank: を入力してください
+        taken: はすでに存在します
+        invalid: は不正な値です
+    attributes:
+      user:
+        name: 名前
+        email: メールアドレス
+        password: パスワード
+        role: 権限
