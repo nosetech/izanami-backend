@@ -46,9 +46,7 @@ jobs:
         run: docker compose up -d --build
 
       - name: Wait for services
-        run: |
-          sleep 10
-          docker container ls
+        run: sleep 10
 
       - name: Run tests
-        run: docker compose exec -T app bundle exec rspec
+        run: docker compose run -T app bundle exec rspec
