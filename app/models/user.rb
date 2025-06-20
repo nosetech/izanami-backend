@@ -3,10 +3,10 @@ class User < ApplicationRecord
   has_secure_password
 
   enum :role, {
-    admin: 'admin',
-    member: 'member',
-    guest: 'guest'
-  }, default: 'member'
+    admin: "admin",
+    member: "member",
+    guest: "guest"
+  }, default: "member"
 
   validates :name, presence: true, length: { maximum: 200 }
   validates :email, presence: true,

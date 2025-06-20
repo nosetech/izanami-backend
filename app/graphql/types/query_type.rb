@@ -10,8 +10,8 @@ module Types
       context.schema.object_from_id(id, context)
     end
 
-    field :nodes, [Types::NodeType, null: true], null: true, description: "Fetches a list of objects given a list of IDs." do
-      argument :ids, [ID], required: true, description: "IDs of the objects."
+    field :nodes, [ Types::NodeType, null: true ], null: true, description: "Fetches a list of objects given a list of IDs." do
+      argument :ids, [ ID ], required: true, description: "IDs of the objects."
     end
 
     def nodes(ids:)
@@ -20,7 +20,7 @@ module Types
 
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
-    field :users, [Types::UserType], null: false, description: "Returns a list of active users"
+    field :users, [ Types::UserType ], null: false, description: "Returns a list of active users"
     field :user, Types::UserType, null: true do
       argument :id, ID, required: true, description: "ID of the user"
     end
@@ -32,8 +32,8 @@ module Types
     def user(id:)
       User.active.find_by(id: id)
     end
- 
-    field :families, [Types::FamilyType], null: false, description: "Returns a list of families"
+
+    field :families, [ Types::FamilyType ], null: false, description: "Returns a list of families"
     field :family, Types::FamilyType, null: true do
       argument :id, ID, required: true, description: "ID of the family"
     end
@@ -45,6 +45,5 @@ module Types
     def family(id:)
       Family.active.find_by(id: id)
     end
-
   end
 end

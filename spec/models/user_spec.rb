@@ -4,7 +4,7 @@ RSpec.describe User, type: :model do
   include FactoryBot::Syntax::Methods
   describe 'バリデーション' do
     let(:family) { create(:family) }
-    
+
     it '名前、メールアドレス、パスワード、ロールがあれば有効である' do
       user = build(:user, family: family, name: 'テストユーザー', email: 'test@example.com', password: 'password', role: 'member')
       expect(user).to be_valid
