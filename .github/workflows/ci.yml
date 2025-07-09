@@ -46,4 +46,6 @@ jobs:
         env:
           DATABASE_URL: postgres://izanami:password@127.0.0.1:5432/izanami_backend_development
           RAILS_ENV: development
-        run: bundle exec rspec
+        run: |
+          ./bin/rails db:migrate
+          bundle exec rspec
