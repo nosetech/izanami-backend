@@ -1,0 +1,29 @@
+services:
+  db:
+    container_name: izanami_backend_db
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: izanami
+      POSTGRES_DB: izanami_backend_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    container_name: izanami_backend_app
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3001 -b '0.0.0.0'"
+    volumes:
+      - .:/rails
+    ports:
+      - "3001:3001"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgres://izanami:password@db:5432/izanami_backend_development
+      RAILS_ENV: development
+
+volumes:
+  postgres_data:
