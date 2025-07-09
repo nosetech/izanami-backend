@@ -21,7 +21,7 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -36,12 +36,6 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Set up Docker Compose
         run: docker compose up -d --build
 
@@ -49,4 +43,7 @@ jobs:
         run: sleep 10
 
       - name: Run tests
-        run: docker compose run -T app bundle exec rspec
+        env:
+          DATABASE_URL: postgres://izanami:password@127.0.0.1:5432/izanami_backend_development
+          RAILS_ENV: development
+        run: bundle exec rspec
