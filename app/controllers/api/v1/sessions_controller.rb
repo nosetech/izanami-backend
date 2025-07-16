@@ -6,7 +6,7 @@ module Api
 
         if user&.authenticate(session_params[:password])
           token = Jwt::TokenProvider.call(user.id)
-          render json: ActiveModelSerializers::SerializableResource.new(user, serializer: UserSerializer).as_json.deep_merge(user: { token: })
+          render json: ActiveModelSerializers::SerializableResource.new(user, serializer: UserSerializer).as_json.deep_merge(token:)
         else
           render json: { error: { messages: [ "mistake email or password" ] } }, status: :unauthorized
         end
