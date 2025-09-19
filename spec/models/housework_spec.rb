@@ -81,12 +81,12 @@ RSpec.describe Housework, type: :model do
       expect(described_class.active).not_to include(deleted_housework)
     end
 
-    it 'committedスコープはコミット済みの家事を返す' do
+    it 'committedスコープは承認済みの家事を返す' do
       expect(described_class.committed).to include(committed_housework)
       expect(described_class.committed).not_to include(uncommitted_housework)
     end
 
-    it 'uncommittedスコープは未コミットの家事を返す' do
+    it 'uncommittedスコープは未承認の家事を返す' do
       expect(described_class.uncommitted).to include(uncommitted_housework)
       expect(described_class.uncommitted).not_to include(committed_housework)
     end
