@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_161701) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_19_014501) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,6 +19,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_161701) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "houseworks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.string "title", limit: 200, null: false
+    t.string "description", limit: 500
+    t.string "schedule", limit: 100
+    t.uuid "suggested_by_id", null: false
+    t.integer "point", default: 0, null: false
+    t.boolean "committed", default: false, null: false
+    t.datetime "deleted_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deleted_at"], name: "index_houseworks_on_deleted_at"
+    t.index ["family_id"], name: "index_houseworks_on_family_id"
+    t.index ["suggested_by_id"], name: "index_houseworks_on_suggested_by_id"
   end
 
   create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -33,5 +49,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_161701) do
     t.index ["family_id"], name: "index_users_on_family_id"
   end
 
+  add_foreign_key "houseworks", "families"
+  add_foreign_key "houseworks", "users", column: "suggested_by_id"
   add_foreign_key "users", "families"
 end

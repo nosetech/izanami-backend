@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   belongs_to :family, optional: true  # 最初は家族未設定のユーザーも許容
+  has_many :suggested_houseworks, class_name: "Housework", foreign_key: "suggested_by"
   has_secure_password
 
   enum :role, {
