@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh issue create:*)",
+      "Bash(gh issue view:*)",
+      "Bash(bin/rails generate:*)",
+      "Bash(docker compose:*)",
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "mcp__inkdrop__list-notebooks",
+      "mcp__inkdrop__create-note"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

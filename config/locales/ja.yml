@@ -5,9 +5,18 @@ ja:
         blank: を入力してください
         taken: はすでに存在します
         invalid: は不正な値です
+        too_long: は%{count}文字以内で入力してください
+        greater_than_or_equal_to: は%{count}以上の値にしてください
+        inclusion: は一覧にありません
     attributes:
       user:
         name: 名前
         email: メールアドレス
         password: パスワード
         role: 権限
+      housework:
+        title: タイトル
+        description: 説明
+        schedule: スケジュール
+        point: ポイント
+        committed: 承認済み
