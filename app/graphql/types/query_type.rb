@@ -59,41 +59,23 @@ module Types
       user = context[:current_user]
       return nil unless user
 
-      begin
-        housework_obj = GlobalID.find(id)
-        return nil unless housework_obj.is_a?(Housework)
-        return nil if housework_obj.deleted_at.present?
-        return nil unless housework_obj.family_id == user.family_id
-        housework_obj
-      rescue ActiveRecord::RecordNotFound, URI::GID::MissingModelIdError
-        nil
-      end
+      housework = Housework.active.find_by(id: id)
+      return nil unless housework
+      return nil unless housework.family_id == user.family_id
+
+      housework
     end
 
     def houseworks(family_id:, filter: nil)
       user = context[:current_user]
       return [] unless user
+      return [] unless user.family_id == family_id
 
-      begin
-        family_obj = GlobalID.find(family_id)
-        return [] unless family_obj.is_a?(Family)
-        return [] unless family_obj.id == user.family_id
-      rescue ActiveRecord::RecordNotFound, URI::GID::MissingModelIdError
-        return []
-      end
-
-      houseworks = Housework.active.where(family_id: family_obj.id)
+      houseworks = Housework.active.where(family_id: family_id)
 
       if filter
         houseworks = houseworks.where(committed: filter[:committed]) unless filter[:committed].nil?
-        if filter[:suggested_by_id].present?
-          begin
-            suggested_by_obj = GlobalID.find(filter[:suggested_by_id])
-            houseworks = houseworks.where(suggested_by_id: suggested_by_obj.id) if suggested_by_obj.is_a?(User)
-          rescue ActiveRecord::RecordNotFound, URI::GID::MissingModelIdError
-            # Invalid suggested_by_id, ignore this filter
-          end
-        end
+        houseworks = houseworks.where(suggested_by_id: filter[:suggested_by_id]) if filter[:suggested_by_id].present?
         houseworks = houseworks.where(point: filter[:point_min]..) if filter[:point_min].present?
         houseworks = houseworks.where(point: ..filter[:point_max]) if filter[:point_max].present?
       end

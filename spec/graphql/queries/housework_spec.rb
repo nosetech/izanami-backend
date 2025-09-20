@@ -11,8 +11,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
   let!(:housework2) { create(:housework, family: family, suggested_by: user, title: '洗濯', point: 5, committed: true) }
   let!(:other_housework) { create(:housework, family: other_family, suggested_by: other_user) }
 
-  def execute_query(query_string, context = {})
-    IzanamiBackendSchema.execute(query_string, context: context)
+  def execute_query(query_string, variables: {}, context: {})
+    IzanamiBackendSchema.execute(query_string, variables: variables, context: context)
   end
 
   describe 'housework query' do
@@ -40,21 +40,21 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
     context 'when user is in the same family' do
       it 'returns the housework' do
-        result = execute_query(query, { variables: { id: housework1.to_gid_param }, current_user: user })
+        result = execute_query(query, variables: { id: housework1.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
         data = result['data']['housework']
-        expect(data['id']).to eq(housework1.to_gid_param)
+        expect(data['id']).to eq(housework1.id)
         expect(data['title']).to eq('掃除')
         expect(data['point']).to eq(10)
         expect(data['committed']).to eq(false)
-        expect(data['suggestedBy']['id']).to eq(user.to_gid_param)
+        expect(data['suggestedBy']['id']).to eq(user.id)
       end
     end
 
     context 'when user is not in the same family' do
       it 'returns null' do
-        result = execute_query(query, { variables: { id: other_housework.to_gid_param }, current_user: user })
+        result = execute_query(query, variables: { id: other_housework.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
         expect(result['data']['housework']).to be_nil
@@ -63,7 +63,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
     context 'when user is not authenticated' do
       it 'returns null' do
-        result = execute_query(query, { variables: { id: housework1.to_gid_param } })
+        result = execute_query(query, variables: { id: housework1.id })
 
         expect(result['errors']).to be_nil
         expect(result['data']['housework']).to be_nil
@@ -73,7 +73,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
     context 'when housework is deleted' do
       it 'returns null' do
         housework1.update!(deleted_at: Time.current)
-        result = execute_query(query, { variables: { id: housework1.to_gid_param }, current_user: user })
+        result = execute_query(query, variables: { id: housework1.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
         expect(result['data']['housework']).to be_nil
@@ -105,7 +105,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
     context 'when user is in the same family' do
       it 'returns all houseworks for the family' do
-        result = execute_query(query, { variables: { familyId: family.to_gid_param }, current_user: user })
+        result = execute_query(query, variables: { familyId: family.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
         data = result['data']['houseworks']
@@ -116,10 +116,10 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
       context 'with committed filter' do
         it 'returns only committed houseworks' do
-          result = execute_query(query, {
-            variables: { familyId: family.to_gid_param, filter: { committed: true } },
-            current_user: user
-          })
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { committed: true } },
+            context: { current_user: user }
+          )
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
@@ -131,10 +131,10 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
       context 'with suggested_by filter' do
         it 'returns houseworks suggested by the specified user' do
-          result = execute_query(query, {
-            variables: { familyId: family.to_gid_param, filter: { suggestedById: user.to_gid_param } },
-            current_user: user
-          })
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { suggestedById: user.id } },
+            context: { current_user: user }
+          )
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
@@ -144,10 +144,10 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
       context 'with point range filter' do
         it 'returns houseworks within the point range' do
-          result = execute_query(query, {
-            variables: { familyId: family.to_gid_param, filter: { pointMin: 8 } },
-            current_user: user
-          })
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { pointMin: 8 } },
+            context: { current_user: user }
+          )
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
@@ -160,7 +160,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
     context 'when user is not in the same family' do
       it 'returns empty array' do
-        result = execute_query(query, { variables: { familyId: other_family.to_gid_param }, current_user: user })
+        result = execute_query(query, variables: { familyId: other_family.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
         expect(result['data']['houseworks']).to eq([])
@@ -169,7 +169,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
     context 'when user is not authenticated' do
       it 'returns empty array' do
-        result = execute_query(query, { variables: { familyId: family.to_gid_param } })
+        result = execute_query(query, variables: { familyId: family.id })
 
         expect(result['errors']).to be_nil
         expect(result['data']['houseworks']).to eq([])
