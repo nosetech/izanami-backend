@@ -6,7 +6,7 @@ RSpec.describe User, type: :model do
     let(:family) { create(:family) }
 
     it '名前、メールアドレス、パスワード、ロールがあれば有効である' do
-      user = build(:user, family: family, name: 'テストユーザー', email: 'test@example.com', password: 'password', role: 'member')
+      user = build(:user, family: family, name: 'テストユーザー', email: 'valid_user@example.com', password: 'password', role: 'member')
       expect(user).to be_valid
     end
 
@@ -23,8 +23,8 @@ RSpec.describe User, type: :model do
     end
 
     it '重複したメールアドレスなら無効である' do
-      create(:user, family: family, email: 'test@example.com')
-      user = build(:user, family: family, email: 'test@example.com')
+      create(:user, family: family, email: 'duplicate@example.com')
+      user = build(:user, family: family, email: 'duplicate@example.com')
       expect(user).not_to be_valid
       expect(user.errors[:email]).to include("はすでに存在します")
     end

@@ -45,5 +45,42 @@ module Types
     def family(id:)
       Family.active.find_by(id: id)
     end
+
+    field :housework, Types::HouseworkType, null: true do
+      argument :id, ID, required: true, description: "ID of the housework"
+    end
+
+    field :houseworks, [ Types::HouseworkType ], null: false do
+      argument :family_id, ID, required: true, description: "ID of the family"
+      argument :filter, Types::HouseworkFilterInputType, required: false, description: "Filter options"
+    end
+
+    def housework(id:)
+      user = context[:current_user]
+      return nil unless user
+
+      housework = Housework.active.find_by(id: id)
+      return nil unless housework
+      return nil unless housework.family_id == user.family_id
+
+      housework
+    end
+
+    def houseworks(family_id:, filter: nil)
+      user = context[:current_user]
+      return [] unless user
+      return [] unless user.family_id == family_id
+
+      houseworks = Housework.active.where(family_id: family_id)
+
+      if filter
+        houseworks = houseworks.where(committed: filter[:committed]) unless filter[:committed].nil?
+        houseworks = houseworks.where(suggested_by_id: filter[:suggested_by_id]) if filter[:suggested_by_id].present?
+        houseworks = houseworks.where(point: filter[:point_min]..) if filter[:point_min].present?
+        houseworks = houseworks.where(point: ..filter[:point_max]) if filter[:point_max].present?
+      end
+
+      houseworks
+    end
   end
 end
