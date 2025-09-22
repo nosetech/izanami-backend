@@ -11,7 +11,8 @@
       "mcp__inkdrop__list-notebooks",
       "mcp__inkdrop__create-note",
       "Bash(docker exec:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "mcp__inkdrop__search-notes"
     ],
     "deny": [],
     "ask": []
