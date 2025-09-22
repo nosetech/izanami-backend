@@ -85,20 +85,31 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
   describe 'houseworks query' do
     let(:query) do
       <<~GRAPHQL
-        query($familyId: ID!, $filter: HouseworkFilterInput, $sort: HouseworkSortInput) {
-          houseworks(familyId: $familyId, filter: $filter, sort: $sort) {
-            id
-            title
-            description
-            schedule
-            suggestedBy {
-              id
-              name
+        query($familyId: ID!, $filter: HouseworkFilterInput, $sort: HouseworkSortInput, $first: Int, $after: String) {
+          houseworks(familyId: $familyId, filter: $filter, sort: $sort, first: $first, after: $after) {
+            edges {
+              node {
+                id
+                title
+                description
+                schedule
+                suggestedBy {
+                  id
+                  name
+                }
+                point
+                committed
+                createdAt
+                updatedAt
+              }
+              cursor
             }
-            point
-            committed
-            createdAt
-            updatedAt
+            pageInfo {
+              hasNextPage
+              hasPreviousPage
+              startCursor
+              endCursor
+            }
           }
         }
       GRAPHQL
@@ -110,8 +121,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
         expect(result['errors']).to be_nil
         data = result['data']['houseworks']
-        expect(data.length).to eq(3)
-        titles = data.map { |h| h['title'] }
+        expect(data['edges'].length).to eq(3)
+        titles = data['edges'].map { |edge| edge['node']['title'] }
         expect(titles).to contain_exactly('掃除', '洗濯', '料理')
       end
 
@@ -124,9 +135,9 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(1)
-          expect(data[0]['title']).to eq('洗濯')
-          expect(data[0]['committed']).to eq(true)
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('洗濯')
+          expect(data['edges'][0]['node']['committed']).to eq(true)
         end
       end
 
@@ -139,7 +150,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
+          expect(data['edges'].length).to eq(3)
         end
       end
 
@@ -152,8 +163,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(2)
-          titles = data.map { |h| h['title'] }
+          expect(data['edges'].length).to eq(2)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to contain_exactly('掃除', '料理')
         end
       end
@@ -167,8 +178,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          titles = data.map { |h| h['title'] }
+          expect(data['edges'].length).to eq(3)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to eq([ '掃除', '料理', '洗濯' ])
         end
 
@@ -180,8 +191,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          titles = data.map { |h| h['title'] }
+          expect(data['edges'].length).to eq(3)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to eq([ '洗濯', '料理', '掃除' ])
         end
 
@@ -193,8 +204,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          points = data.map { |h| h['point'] }
+          expect(data['edges'].length).to eq(3)
+          points = data['edges'].map { |edge| edge['node']['point'] }
           expect(points).to eq([ 5, 10, 15 ])
         end
 
@@ -206,8 +217,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          points = data.map { |h| h['point'] }
+          expect(data['edges'].length).to eq(3)
+          points = data['edges'].map { |edge| edge['node']['point'] }
           expect(points).to eq([ 15, 10, 5 ])
         end
 
@@ -219,8 +230,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          titles = data.map { |h| h['title'] }
+          expect(data['edges'].length).to eq(3)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to eq([ '料理', '掃除', '洗濯' ])
         end
 
@@ -232,8 +243,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          titles = data.map { |h| h['title'] }
+          expect(data['edges'].length).to eq(3)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to eq([ '洗濯', '掃除', '料理' ])
         end
 
@@ -245,8 +256,8 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
-          points = data.map { |h| h['point'] }
+          expect(data['edges'].length).to eq(3)
+          points = data['edges'].map { |edge| edge['node']['point'] }
           expect(points).to eq([ 5, 10, 15 ])
         end
 
@@ -258,7 +269,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
+          expect(data['edges'].length).to eq(3)
         end
 
         it 'ignores invalid direction values' do
@@ -269,7 +280,90 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
 
           expect(result['errors']).to be_nil
           data = result['data']['houseworks']
-          expect(data.length).to eq(3)
+          expect(data['edges'].length).to eq(3)
+        end
+      end
+
+      context 'with pagination parameters' do
+        let!(:housework4) { create(:housework, family: family, suggested_by: user, title: 'ゴミ出し', point: 3, committed: false, created_at: 4.days.ago) }
+        let!(:housework5) { create(:housework, family: family, suggested_by: user, title: '買い物', point: 8, committed: true, created_at: 5.days.ago) }
+
+        it 'returns limited number of houseworks with first parameter' do
+          result = execute_query(query,
+            variables: { familyId: family.id, first: 2 },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          expect(data['pageInfo']['hasNextPage']).to eq(true)
+          expect(data['pageInfo']['startCursor']).not_to be_nil
+          expect(data['pageInfo']['endCursor']).not_to be_nil
+        end
+
+        it 'returns next page with after parameter' do
+          first_result = execute_query(query,
+            variables: { familyId: family.id, first: 2 },
+            context: { current_user: user }
+          )
+          end_cursor = first_result['data']['houseworks']['pageInfo']['endCursor']
+
+          result = execute_query(query,
+            variables: { familyId: family.id, first: 2, after: end_cursor },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to be <= 2
+          expect(data['pageInfo']['hasPreviousPage']).to eq(true)
+        end
+
+        it 'indicates no next page when at the end' do
+          result = execute_query(query,
+            variables: { familyId: family.id, first: 10 },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['pageInfo']['hasNextPage']).to eq(false)
+        end
+
+        it 'works with sorting and pagination combined' do
+          result = execute_query(query,
+            variables: {
+              familyId: family.id,
+              first: 3,
+              sort: { field: 'point', direction: 'desc' }
+            },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(3)
+          points = data['edges'].map { |edge| edge['node']['point'] }
+          expect(points).to eq([ 15, 10, 8 ])
+        end
+
+        it 'works with filtering and pagination combined' do
+          result = execute_query(query,
+            variables: {
+              familyId: family.id,
+              first: 2,
+              filter: { committed: false }
+            },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          data['edges'].each do |edge|
+            expect(edge['node']['committed']).to eq(false)
+          end
         end
       end
     end
@@ -279,7 +373,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
         result = execute_query(query, variables: { familyId: other_family.id }, context: { current_user: user })
 
         expect(result['errors']).to be_nil
-        expect(result['data']['houseworks']).to eq([])
+        expect(result['data']['houseworks']['edges']).to eq([])
       end
     end
 
@@ -288,7 +382,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
         result = execute_query(query, variables: { familyId: family.id })
 
         expect(result['errors']).to be_nil
-        expect(result['data']['houseworks']).to eq([])
+        expect(result['data']['houseworks']['edges']).to eq([])
       end
     end
   end
