@@ -53,6 +53,7 @@ module Types
     field :houseworks, [ Types::HouseworkType ], null: false do
       argument :family_id, ID, required: true, description: "ID of the family"
       argument :filter, Types::HouseworkFilterInputType, required: false, description: "Filter options"
+      argument :sort, Types::HouseworkSortInputType, required: false, description: "Sort options"
     end
 
     def housework(id:)
@@ -66,7 +67,7 @@ module Types
       housework
     end
 
-    def houseworks(family_id:, filter: nil)
+    def houseworks(family_id:, filter: nil, sort: nil)
       user = context[:current_user]
       return [] unless user
       return [] unless user.family_id == family_id
@@ -78,6 +79,18 @@ module Types
         houseworks = houseworks.where(suggested_by_id: filter[:suggested_by_id]) if filter[:suggested_by_id].present?
         houseworks = houseworks.where(point: filter[:point_min]..) if filter[:point_min].present?
         houseworks = houseworks.where(point: ..filter[:point_max]) if filter[:point_max].present?
+      end
+
+      if sort
+        field = sort[:field]
+        direction = sort[:direction] || "asc"
+
+        valid_fields = %w[title point created_at updated_at]
+        valid_directions = %w[asc desc]
+
+        if valid_fields.include?(field) && valid_directions.include?(direction)
+          houseworks = houseworks.order("#{field} #{direction}")
+        end
       end
 
       houseworks
