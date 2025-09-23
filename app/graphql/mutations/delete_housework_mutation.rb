@@ -35,8 +35,8 @@ module Mutations
         }
       end
 
-      # Check if housework is committed and cannot be deleted
-      if housework.committed?
+      # Check if housework is committed and cannot be deleted (except for admins)
+      if housework.committed? && current_user.role != "admin"
         return {
           success: false,
           errors: [ "Cannot delete committed housework" ]

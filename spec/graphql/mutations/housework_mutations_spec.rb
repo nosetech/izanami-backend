@@ -245,18 +245,19 @@ RSpec.describe 'Housework GraphQL Mutations', type: :request do
           expect(data['housework']['committed']).to eq(true)
         end
 
-        it 'cannot update committed housework even as admin' do
+        it 'can update committed housework as admin' do
           variables = {
             id: committed_housework.id,
-            title: 'Admin Trying to Update Committed'
+            title: 'Admin Updated Committed Housework'
           }
 
           result = execute_mutation(mutation, variables: variables, context: { current_user: admin_user })
 
           expect(result['errors']).to be_nil
           data = result['data']['updateHousework']
-          expect(data['errors']).to include('Cannot update committed housework')
-          expect(data['housework']).to be_nil
+          expect(data['errors']).to be_empty
+          expect(data['housework']['title']).to eq('Admin Updated Committed Housework')
+          expect(data['housework']).not_to be_nil
         end
       end
     end
@@ -379,15 +380,19 @@ RSpec.describe 'Housework GraphQL Mutations', type: :request do
         expect(housework.deleted_at).not_to be_nil
       end
 
-      it 'cannot delete committed housework even as admin' do
+      it 'can delete committed housework as admin' do
         variables = { id: committed_housework.id }
 
         result = execute_mutation(mutation, variables: variables, context: { current_user: admin_user })
 
         expect(result['errors']).to be_nil
         data = result['data']['deleteHousework']
-        expect(data['errors']).to include('Cannot delete committed housework')
-        expect(data['success']).to eq(false)
+        expect(data['errors']).to be_empty
+        expect(data['success']).to eq(true)
+
+        # Verify soft delete
+        committed_housework.reload
+        expect(committed_housework.deleted_at).not_to be_nil
       end
     end
 

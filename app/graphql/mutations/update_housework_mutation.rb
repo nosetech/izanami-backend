@@ -40,8 +40,8 @@ module Mutations
         }
       end
 
-      # Check if housework is committed and cannot be updated
-      if housework.committed?
+      # Check if housework is committed and cannot be updated (except for admins)
+      if housework.committed? && current_user.role != "admin"
         return {
           housework: nil,
           errors: [ "Cannot update committed housework" ]
