@@ -10,6 +10,7 @@ module Mutations
     argument :schedule, String, required: false, description: "Schedule information"
     argument :point, Integer, required: false, description: "Points for the housework (admin only)"
     argument :committed, Boolean, required: false, description: "Whether the housework is committed (admin only)"
+    argument :category, Types::HouseworkCategoryEnum, required: false, description: "Category of the housework"
 
     field :housework, Types::HouseworkType, null: true
     field :errors, [ String ], null: false
