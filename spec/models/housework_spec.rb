@@ -55,6 +55,41 @@ RSpec.describe Housework, type: :model do
     end
   end
 
+  describe 'カテゴリー' do
+    let(:family) { create(:family) }
+    let(:user) { create(:user, family: family) }
+
+    it '料理カテゴリーが設定できる' do
+      housework = create(:housework, family: family, suggested_by: user, category: :cooking)
+      expect(housework.category).to eq('cooking')
+      expect(housework.cooking?).to be true
+    end
+
+    it '掃除カテゴリーが設定できる' do
+      housework = create(:housework, family: family, suggested_by: user, category: :cleaning)
+      expect(housework.category).to eq('cleaning')
+      expect(housework.cleaning?).to be true
+    end
+
+    it '買い物カテゴリーが設定できる' do
+      housework = create(:housework, family: family, suggested_by: user, category: :shopping)
+      expect(housework.category).to eq('shopping')
+      expect(housework.shopping?).to be true
+    end
+
+    it '洗濯カテゴリーが設定できる' do
+      housework = create(:housework, family: family, suggested_by: user, category: :laundry)
+      expect(housework.category).to eq('laundry')
+      expect(housework.laundry?).to be true
+    end
+
+    it 'その他カテゴリーが設定できる' do
+      housework = create(:housework, family: family, suggested_by: user, category: :other)
+      expect(housework.category).to eq('other')
+      expect(housework.other?).to be true
+    end
+  end
+
   describe 'アソシエーション' do
     it 'familyに紐付いている' do
       association = described_class.reflect_on_association(:family)

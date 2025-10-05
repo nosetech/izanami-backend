@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_19_014501) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_05_071241) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,6 +32,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_19_014501) do
     t.datetime "deleted_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "category", default: 0, null: false
     t.index ["deleted_at"], name: "index_houseworks_on_deleted_at"
     t.index ["family_id"], name: "index_houseworks_on_family_id"
     t.index ["suggested_by_id"], name: "index_houseworks_on_suggested_by_id"

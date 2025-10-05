@@ -7,5 +7,6 @@ FactoryBot.define do
     schedule { "毎週土曜日" }
     point { 10 }
     committed { false }
+    category { :cleaning }
   end
 end

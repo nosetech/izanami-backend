@@ -9,11 +9,12 @@ module Mutations
     argument :schedule, String, required: false, description: "Schedule information"
     argument :point, Integer, required: false, description: "Points for the housework (admin only)"
     argument :committed, Boolean, required: false, description: "Whether the housework is committed (admin only)"
+    argument :category, Types::HouseworkCategoryEnum, required: false, description: "Category of the housework"
 
     field :housework, Types::HouseworkType, null: true
     field :errors, [ String ], null: false
 
-    def resolve(title:, description: nil, schedule: nil, point: nil, committed: nil)
+    def resolve(title:, description: nil, schedule: nil, point: nil, committed: nil, category: nil)
       current_user = context[:current_user]
 
       unless current_user
@@ -41,6 +42,7 @@ module Mutations
       # Set default values for admin-only fields
       point = 0 if point.nil?
       committed = false if committed.nil?
+      category = "cooking" if category.nil?
 
       housework = Housework.new(
         family_id: current_user.family_id,
@@ -49,7 +51,8 @@ module Mutations
         schedule: schedule,
         suggested_by: current_user,
         point: point,
-        committed: committed
+        committed: committed,
+        category: category
       )
 
       if housework.save
