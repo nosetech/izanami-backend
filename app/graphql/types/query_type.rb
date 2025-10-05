@@ -79,6 +79,7 @@ module Types
         houseworks = houseworks.where(suggested_by_id: filter[:suggested_by_id]) if filter[:suggested_by_id].present?
         houseworks = houseworks.where(point: filter[:point_min]..) if filter[:point_min].present?
         houseworks = houseworks.where(point: ..filter[:point_max]) if filter[:point_max].present?
+        houseworks = houseworks.where(category: filter[:categories]) if filter[:categories].present?
       end
 
       if sort

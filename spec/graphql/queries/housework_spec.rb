@@ -99,6 +99,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
                 }
                 point
                 committed
+                category
                 createdAt
                 updatedAt
               }
@@ -166,6 +167,47 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
           expect(data['edges'].length).to eq(2)
           titles = data['edges'].map { |edge| edge['node']['title'] }
           expect(titles).to contain_exactly('掃除', '料理')
+        end
+      end
+
+      context 'with categories filter' do
+        let!(:cooking_housework) { create(:housework, family: family, suggested_by: user, title: '料理をする', category: :cooking) }
+        let!(:shopping_housework) { create(:housework, family: family, suggested_by: user, title: '買い物に行く', category: :shopping) }
+
+        it 'returns houseworks with a single category' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { categories: [ 'COOKING' ] } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('料理をする')
+        end
+
+        it 'returns houseworks with multiple categories (OR condition)' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { categories: [ 'COOKING', 'SHOPPING' ] } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
+          expect(titles).to contain_exactly('料理をする', '買い物に行く')
+        end
+
+        it 'returns empty when no houseworks match the categories' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { categories: [ 'LAUNDRY' ] } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(0)
         end
       end
 
