@@ -19,7 +19,8 @@ if User.none?
     description: 'リビングルーム全体の掃除機がけと拭き掃除を行う',
     schedule: '毎週土曜日の午前中',
     point: 15,
-    committed: false
+    committed: false,
+    category: :cleaning
   )
 
   puts "管理者ユーザーが作成されました: #{admin_user.email}"
