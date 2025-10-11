@@ -111,6 +111,7 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
               startCursor
               endCursor
             }
+            totalCount
           }
         }
       GRAPHQL
@@ -127,6 +128,14 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
         expect(titles).to contain_exactly('掃除', '洗濯', '料理')
       end
 
+      it 'returns totalCount of all houseworks matching the criteria' do
+        result = execute_query(query, variables: { familyId: family.id }, context: { current_user: user })
+
+        expect(result['errors']).to be_nil
+        data = result['data']['houseworks']
+        expect(data['totalCount']).to eq(3)
+      end
+
       context 'with committed filter' do
         it 'returns only committed houseworks' do
           result = execute_query(query,
@@ -139,6 +148,17 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
           expect(data['edges'].length).to eq(1)
           expect(data['edges'][0]['node']['title']).to eq('洗濯')
           expect(data['edges'][0]['node']['committed']).to eq(true)
+        end
+
+        it 'returns correct totalCount with filter' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { committed: true } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['totalCount']).to eq(1)
         end
       end
 
@@ -342,6 +362,18 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
           expect(data['pageInfo']['hasNextPage']).to eq(true)
           expect(data['pageInfo']['startCursor']).not_to be_nil
           expect(data['pageInfo']['endCursor']).not_to be_nil
+        end
+
+        it 'returns totalCount of all items even when paginated' do
+          result = execute_query(query,
+            variables: { familyId: family.id, first: 2 },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          expect(data['totalCount']).to eq(5)
         end
 
         it 'returns next page with after parameter' do

@@ -50,7 +50,7 @@ module Types
       argument :id, ID, required: true, description: "ID of the housework"
     end
 
-    field :houseworks, Types::HouseworkType.connection_type, null: false do
+    field :houseworks, Types::HouseworkConnection, null: false, connection: true do
       argument :family_id, ID, required: true, description: "ID of the family"
       argument :filter, Types::HouseworkFilterInputType, required: false, description: "Filter options"
       argument :sort, Types::HouseworkSortInputType, required: false, description: "Sort options"
