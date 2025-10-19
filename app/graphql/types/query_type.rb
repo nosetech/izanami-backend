@@ -82,7 +82,7 @@ module Types
         houseworks = houseworks.where(category: filter[:categories]) if filter[:categories].present?
 
         if filter[:keyword].present?
-          keywords = filter[:keyword].split(/\s+/)
+          keywords = filter[:keyword].split(/[\s\u3000]+/)
           keywords.each do |keyword|
             houseworks = houseworks.where("title ILIKE ? OR description ILIKE ?", "%#{keyword}%", "%#{keyword}%")
           end
