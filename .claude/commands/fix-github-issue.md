@@ -7,5 +7,5 @@ GitHub issueを分析して実行してください: issue番号 $ARGUMENTS
 3. 関連ファイルの検索
 4. 修正の実装
 5. gitコミットをする前に、bin/brakeman, bin/rubocopを実行する。エラーがあれば修正する。
-6. gitコミット
+6. gitコミット(developブランチに直接コミットしない。feature/\*ブランチにコミットすること)
 7. developブランチにマージするgitプルリクエスト作成

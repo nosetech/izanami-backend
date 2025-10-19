@@ -12,7 +12,9 @@
       "mcp__inkdrop__create-note",
       "Bash(docker exec:*)",
       "Bash(git commit:*)",
-      "mcp__inkdrop__search-notes"
+      "mcp__inkdrop__search-notes",
+      "Bash(git log:*)",
+      "Bash(gh pr edit:*)"
     ],
     "deny": [],
     "ask": []
