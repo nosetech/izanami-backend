@@ -346,6 +346,95 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
         end
       end
 
+      context 'with keyword filter' do
+        let!(:cooking_housework) { create(:housework, family: family, suggested_by: user, title: '料理をする', description: '夕食を準備する', point: 20) }
+        let!(:dinner_housework) { create(:housework, family: family, suggested_by: user, title: '夕食の後片付け', description: '食器を洗う', point: 10) }
+
+        it 'returns houseworks matching a single keyword in title' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '料理' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
+          expect(titles).to contain_exactly('料理', '料理をする')
+        end
+
+        it 'returns houseworks matching a single keyword in description' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '食器' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('夕食の後片付け')
+        end
+
+        it 'returns houseworks matching multiple keywords (AND condition)' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '料理 夕食' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('料理をする')
+        end
+
+        it 'returns empty when no houseworks match all keywords' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '料理 食器' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(0)
+        end
+
+        it 'is case-insensitive' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '食器' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('夕食の後片付け')
+        end
+
+        it 'returns correct totalCount with keyword filter' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '料理' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['totalCount']).to eq(2)
+        end
+
+        it 'combines keyword filter with other filters' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '夕食', committed: false } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(2)
+          titles = data['edges'].map { |edge| edge['node']['title'] }
+          expect(titles).to contain_exactly('料理をする', '夕食の後片付け')
+        end
+      end
+
       context 'with pagination parameters' do
         let!(:housework4) { create(:housework, family: family, suggested_by: user, title: 'ゴミ出し', point: 3, committed: false, created_at: 4.days.ago) }
         let!(:housework5) { create(:housework, family: family, suggested_by: user, title: '買い物', point: 8, committed: true, created_at: 5.days.ago) }

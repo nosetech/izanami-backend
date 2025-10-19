@@ -80,6 +80,13 @@ module Types
         houseworks = houseworks.where(point: filter[:point_min]..) if filter[:point_min].present?
         houseworks = houseworks.where(point: ..filter[:point_max]) if filter[:point_max].present?
         houseworks = houseworks.where(category: filter[:categories]) if filter[:categories].present?
+
+        if filter[:keyword].present?
+          keywords = filter[:keyword].split(/\s+/)
+          keywords.each do |keyword|
+            houseworks = houseworks.where("title ILIKE ? OR description ILIKE ?", "%#{keyword}%", "%#{keyword}%")
+          end
+        end
       end
 
       if sort
