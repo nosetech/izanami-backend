@@ -387,6 +387,18 @@ RSpec.describe 'Housework GraphQL Queries', type: :request do
           expect(data['edges'][0]['node']['title']).to eq('料理をする')
         end
 
+        it 'returns houseworks matching multiple keywords by full-width space' do
+          result = execute_query(query,
+            variables: { familyId: family.id, filter: { keyword: '料理　夕食' } },
+            context: { current_user: user }
+          )
+
+          expect(result['errors']).to be_nil
+          data = result['data']['houseworks']
+          expect(data['edges'].length).to eq(1)
+          expect(data['edges'][0]['node']['title']).to eq('料理をする')
+        end
+
         it 'returns empty when no houseworks match all keywords' do
           result = execute_query(query,
             variables: { familyId: family.id, filter: { keyword: '料理 食器' } },
